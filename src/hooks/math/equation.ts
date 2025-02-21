@@ -12,6 +12,8 @@ export const postEquationResult = async (equation: Equation, result: number): Pr
     const body = await post<boolean>("api", {
         eq: equation,
         result: result
+    }, {
+        "Content-Type": "application/json"
     });
     return body;
 }
