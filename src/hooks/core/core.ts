@@ -31,3 +31,18 @@ export const post = <T>(resource: string, body?: any, headers?: HeadersInit): Pr
         return err;
     })
 }
+
+export const del = <T>(resource: string, body?: any, headers?: HeadersInit): Promise<T> => {
+    const url = baseUrl + resource;
+    return fetch(url, {
+        method: "DELETE",
+        body: JSON.stringify(body),
+        headers: {
+            ...commonHeaders,
+            ...headers
+        }
+    }).then(response => response.json()).catch(err => {
+        console.error(err);
+        return err;
+    })
+}
