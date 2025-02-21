@@ -1,7 +1,9 @@
 
 const commonHeaders = {};
+const baseUrl = "http://localhost:9000/"
 
-export const get = <T>(url: string, body?: any, headers?: HeadersInit): Promise<T> => {
+export const get = <T>(resource: string, body?: any, headers?: HeadersInit): Promise<T> => {
+    const url = baseUrl + resource;
     return fetch(url, {
         method: "GET",
         body: JSON.stringify(body),
@@ -15,7 +17,8 @@ export const get = <T>(url: string, body?: any, headers?: HeadersInit): Promise<
     })
 }
 
-export const post = <T>(url: string, body?: any, headers?: HeadersInit): Promise<T> => {
+export const post = <T>(resource: string, body?: any, headers?: HeadersInit): Promise<T> => {
+    const url = baseUrl + resource;
     return fetch(url, {
         method: "POST",
         body: JSON.stringify(body),
