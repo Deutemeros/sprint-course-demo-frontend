@@ -12,3 +12,8 @@ export interface Equation {
     b: number
     op: Operation
 }
+
+export interface EquationResults {
+    eq: Equation
+    results: number
+}

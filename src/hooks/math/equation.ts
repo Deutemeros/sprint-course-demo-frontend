@@ -1,4 +1,4 @@
-import { Equation } from "../../model"
+import { Equation, EquationResults } from "../../model"
 import { get, post } from "../core"
 
 
@@ -8,11 +8,11 @@ export const getNewEquation = async (): Promise<Equation> => {
 }
 
 
-export const postEquationResult = async (equation: Equation, result: number): Promise<boolean> => {
+export const postEquationResult = async (equation: Equation, results: number): Promise<boolean> => {
     const body = await post<boolean>("api", {
         eq: equation,
-        result: result
-    }, {
+        results: results
+    } as EquationResults, {
         "Content-Type": "application/json"
     });
     return body;
