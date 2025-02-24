@@ -6,6 +6,7 @@ export interface Field {
 export interface MathFigure {
     id: number
     name: string
-    field: Field
+    url?: string
+    field: Field[]
     description?: string
 }

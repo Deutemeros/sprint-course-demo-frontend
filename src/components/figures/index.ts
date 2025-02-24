@@ -1,2 +1,2 @@
 export * from './figure';
-export * from './field';
+export * from './figures';
