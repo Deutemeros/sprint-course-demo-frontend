@@ -18,6 +18,9 @@ export const NavBar = () => {
   }, {
     key: "2",
     label: 'Figures',
+  }, {
+    key: "3",
+    label: 'Field',
   }]
 
   const onClick = (info: MenuInfo) => {
@@ -29,7 +32,10 @@ export const NavBar = () => {
         navigate("/fastmath");
         break;
       case items[2]?.key:
-        navigate("/figures");
+        navigate("/figure");
+        break;
+      case items[3]?.key:
+        navigate("/field");
         break;
     }
     setSelectedMenu([info.key]);
