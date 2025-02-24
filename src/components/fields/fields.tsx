@@ -1,47 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { Field } from '../../model';
-import { getAllFigures } from '../../hooks/figures';
-import { Button, Layout, Table } from 'antd';
+import { getAllFields } from '../../hooks/figures';
+import { Button, Layout, Table, TableColumnsType } from 'antd';
 import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 interface DataType {
   key: string;
   name: string;
-  description?: string;
-  field: Field[];
 }
 
 export const Fields = () => {
   const navigate = useNavigate();
-  const [figures, setFigures] = useState<DataType[]>();
+  const [fields, setFields] = useState<DataType[]>();
 
   useEffect(() => {
-    getAllFigures().then(figures => {
-      console.log(figures);
-      const data = figures.map(f => ({
+    getAllFields().then(fields => {
+      const data = fields.map(f => ({
         ...f,
         key: '' + f.id,
       }));
-      return setFigures(data);
+      return setFields(data);
     });
   }, [])
 
-  const columns = [
+  const columns: TableColumnsType<DataType> = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-    },
-    {
-      title: 'Field',
-      dataIndex: 'field',
-      key: 'field',
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
+      render: (value: any, record: DataType, index: number) => <Link to={`/field/${record.key}`}>{value}</Link>
+    }
   ];
 
   const onClickNewMathFigure = () => {
@@ -52,6 +40,6 @@ export const Fields = () => {
     <Layout.Header style={{backgroundColor: '#e0e0e0', display: 'flex', alignItems: 'center'}}>
       <Button onClick={onClickNewMathFigure} style={{ marginRight: '0px', marginLeft: 'auto' }}>Add New Field</Button>
     </Layout.Header>
-    <Table dataSource={figures} columns={columns} />
+    <Table dataSource={fields} columns={columns}/>
   </Layout>
 }

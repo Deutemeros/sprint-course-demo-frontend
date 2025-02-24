@@ -1,53 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Field, MathFigure } from '../../model';
-import { createField, getFieldByID, getFigureByFieldID, updateField } from '../../hooks/figures';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Field } from '../../model';
+import { createField, getFieldByID, updateField } from '../../hooks/figures';
 import { Button, Form, FormProps, Input, Layout, Table } from 'antd';
 
-type FieldType = {
-  name?: string;
-};
 
 export const FieldForm = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const intID = id ? parseInt(id) : undefined;
-  const [field, setField] = useState<Field>();
-  const [figures, setFigures] = useState<MathFigure[]>([]);
-  const [form] = Form.useForm<FieldType>();
+  const [form] = Form.useForm<Field>();
 
   useEffect(() => {
     if (intID === undefined || intID === 0) {
       return
     }
-    getFieldByID(intID).then(field => setField(field));
-  }, [intID])
-
-  useEffect(() => {
-    if (intID === undefined || intID === 0) {
-      return
-    }
-    getFigureByFieldID(intID).then(figures => setFigures(figures ?? []));
-  }, [intID])
+    getFieldByID(intID).then(field => {
+      if (field === undefined) {
+        console.error(`no entity with id=${intID}`);
+        return ;
+      }
+      form.setFieldsValue(field);
+    });
+  }, [intID, form])
 
   if (intID === undefined) {
     return <>Invalid ID</>
   }
 
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+  const onFinish: FormProps<Field>['onFinish'] = (values) => {
     console.log('Success:', values);
     if (id === '0') {
       createField({
         name: values.name
-      } as Field);
+      } as Field).then(field => {
+        navigate(`/field/${field.id}`);
+      });
     } else {
       updateField({
         id: intID,
         name: values.name
-      } as Field);
+      } as Field).then(field => {
+        form.setFieldsValue(field);
+      });
     }
   };
   
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+  const onFinishFailed: FormProps<Field>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
@@ -71,7 +70,7 @@ export const FieldForm = () => {
 
   return <Layout>
     <Layout.Header style={{ backgroundColor: '#e0e0e0' }}>
-      {field?.name}
+      {form.getFieldValue("name")}
     </Layout.Header>
     <Layout.Content>
       <Form
@@ -81,7 +80,7 @@ export const FieldForm = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <Form.Item<FieldType>
+        <Form.Item<Field>
           label="Name"
           name="name"
           rules={[{ required: true, message: 'Name is required' }]}
@@ -94,7 +93,7 @@ export const FieldForm = () => {
         </Form.Item>
       </Form>
 
-      <Table dataSource={figures} columns={columns} />
+      <Table dataSource={form.getFieldValue("mathFigure")} columns={columns} />
     </Layout.Content>
   </Layout>
 }
