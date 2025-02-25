@@ -1,4 +1,4 @@
-import { MathFigure } from "../../model"
+import { MathFigure, MathFigureInput } from "../../model"
 import { del, get, post } from "../core";
 
 export const getAllFigures = async (): Promise<MathFigure[]> => {
@@ -6,19 +6,19 @@ export const getAllFigures = async (): Promise<MathFigure[]> => {
     return body;
 }
 
-export const getFigureByID = async (id: number): Promise<MathFigure | undefined> => {
+export const getFigureByID = async (id: number | string): Promise<MathFigure | undefined> => {
     const body = await get<MathFigure>(`api/mathfigure/${id}`);
     return body;
 }
 
-export const createFigure = async (figure: MathFigure): Promise<MathFigure> => {
+export const createFigure = async (figure: MathFigureInput): Promise<MathFigure> => {
     const body = await post<MathFigure>(`api/mathfigure`, figure, {
         "Content-Type": "application/json"
     });
     return body;
 }
 
-export const updateFigure = async (figure: MathFigure): Promise<MathFigure> => {
+export const updateFigure = async (figure: MathFigureInput): Promise<MathFigure> => {
     if (figure.id === undefined) {
         return Promise.reject("missing ID");
     }
@@ -28,7 +28,7 @@ export const updateFigure = async (figure: MathFigure): Promise<MathFigure> => {
     return body;
 }
 
-export const deleteFigure = async (id: number): Promise<undefined> => {
+export const deleteFigure = async (id: number | string): Promise<undefined> => {
     await del<MathFigure>(`api/mathfigure/${id}`);
     return undefined;
 }

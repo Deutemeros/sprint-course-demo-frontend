@@ -6,12 +6,12 @@ export const getAllFields = async (): Promise<Field[]> => {
     return body;
 }
 
-export const getFieldByID = async (id: number): Promise<Field | undefined> => {
+export const getFieldByID = async (id: number | string): Promise<Field | undefined> => {
     const body = await get<Field>(`api/field/${id}`);
     return body;
 }
 
-export const getFigureByFieldID = async (id: number): Promise<MathFigure[] | undefined> => {
+export const getFigureByFieldID = async (id: number | string): Promise<MathFigure[] | undefined> => {
     const body = await get<MathFigure[]>(`api/field/${id}/mathFigure`);
     return body;
 }
@@ -33,7 +33,7 @@ export const updateField = async (figure: Field): Promise<Field> => {
     return body;
 }
 
-export const deleteField = async (id: number): Promise<undefined> => {
+export const deleteField = async (id: number | string): Promise<undefined> => {
     await del<Field>(`api/field/${id}`);
     return undefined;
 }

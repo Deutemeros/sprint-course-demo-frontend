@@ -30,7 +30,6 @@ export const MathPage = () => {
     const onSubmit = () => {
         if (equation !== undefined && result !== undefined) {
             postEquationResult(equation, result).then(ok => {
-                console.log(ok);
                 if (ok) {
                     getNewEquation().then(eq => {
                         setEquation(eq);

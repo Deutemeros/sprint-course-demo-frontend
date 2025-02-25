@@ -1,60 +1,91 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Field, MathFigure } from '../../model';
-import { getAllFields, getFigureByID } from '../../hooks/figures';
-import { Button, Form, FormProps, Input, Layout, Select } from 'antd';
+import { createFigure, deleteFigure, getAllFields, getFigureByID, updateFigure } from '../../hooks/figures';
+import { Button, Form, FormProps, Input, Layout, Modal, Select, Typography } from 'antd';
+import { DefaultOptionType } from 'antd/es/select';
 
-type FieldType = {
-  name?: string;
-  description?: string;
-  url?: string;
-  fields?: Field[];
-};
+interface FieldType {
+  name: string
+  url?: string
+  description?: string
+  fieldId: number
+}
 
 export const FigureForm = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
-  const intID = id ? parseInt(id) : undefined;
-  const [figure, setFigure] = useState<MathFigure>();
-  const [fields, setFields] = useState<Field[]>([]);
+  const [fields, setFields] = useState<DefaultOptionType[]>([]);
   const [form] = Form.useForm();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (intID === undefined || intID === 0) {
+    if (id === undefined || id === '0') {
       return
     }
-    getFigureByID(intID).then(figure => setFigure(figure));
-  }, [intID])
+    getFigureByID(id).then(figure => {
+      if (figure === undefined) {
+        console.error(`no entity with id=${id}`);
+        return;
+      }
+      form.setFieldsValue(figure);
+    });
+  }, [id, form])
 
   useEffect(() => {
-    getAllFields().then(fields => setFields(fields));
+    getAllFields().then(fields => setFields(fields.map(f => ({
+      value: f.id,
+      label: f.name,
+    }))));
   }, [])
 
-  if (intID === undefined) {
+  if (id === undefined) {
     return <>Invalid ID</>
   }
 
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
-    if (id === '0') {
+  const onDeleteClick = () => {
+    setIsModalOpen(true);
+  }
 
+  const onDeleteConfirm = () => {
+    deleteFigure(id).then(() => navigate("/figure"))
+  }
+
+  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+    if (id === '0') {
+      createFigure(values).then(figure => {
+        navigate(`/figure/${figure.id}`);
+      });
+    } else {
+      updateFigure({
+        id: id,
+        ...values
+      }).then(figure => {
+        form.setFieldsValue(figure);
+      });
     }
   };
 
-  const fieldsSelect = (field: Field) => {
-    console.log(field)
-  }
+  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.error('Failed:', errorInfo);
+  };
 
   return <Layout>
-    <Layout.Header style={{ backgroundColor: '#e0e0e0' }}>
-      {figure?.name}
+    <Layout.Header style={{ backgroundColor: '#e0e0e0', display: 'flex', flexDirection: 'row', alignItems: 'center',  }}>
+      <Typography style={{marginRight: 'auto'}}>
+        <Typography.Title level={2}>
+          {form.getFieldValue("name")}
+        </Typography.Title>
+      </Typography>
+      <Button color='danger' variant="solid" onClick={onDeleteClick}>Delete</Button>
     </Layout.Header>
     <Layout.Content>
       <Form
         labelCol={{ span: 2 }}
         wrapperCol={{ span: 20 }}
         form={form}
-        initialValues={{ remember: true }}
         onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
       >
         <Form.Item<FieldType>
           label="Name"
@@ -80,20 +111,21 @@ export const FigureForm = () => {
 
         <Form.Item<FieldType>
           label="Fields"
-          name="fields"
+          name="fieldId"
+          rules={[{ required: true, message: 'Field is required' }]}
         >
           <Select<Field>
-            mode="multiple"
-            allowClear
-            onChange={fieldsSelect}
             options={fields}
           />
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary">Submit</Button>
+          <Button type="primary" htmlType='submit'>Submit</Button>
         </Form.Item>
       </Form>
     </Layout.Content>
+    <Modal title="Are you sure" open={isModalOpen} onOk={onDeleteConfirm} onCancel={() => setIsModalOpen(false)}>
+      <p>Are you sure</p>
+    </Modal>
   </Layout>
 }

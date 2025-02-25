@@ -1,13 +1,20 @@
 export interface Field {
-    id: number
+    id: number | string
     name: string
-    mathFigure: MathFigure[]
 }
 
 export interface MathFigure {
-    id: number
+    id: number | string
     name: string
     url?: string
     field: Field
+    description?: string
+}
+
+export interface MathFigureInput {
+    id?: number | string
+    name: string
+    url?: string
+    fieldId: number
     description?: string
 }
